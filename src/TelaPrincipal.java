@@ -1,5 +1,6 @@
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,33 +10,55 @@ public class TelaPrincipal extends JFrame {
 
     public TelaPrincipal() {
         setTitle("Pesquisar Jogos");
-        setSize(400, 300);
+        setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         listaJogos.add(new Jogo("The Legend of Zelda", "Aventura", "2023-05-12", "Nintendo", "Nintendo"));
         listaJogos.add(new Jogo("God of War", "Ação", "2022-01-14", "Santa Monica Studio", "Sony"));
+        listaJogos.add(new Jogo("Dark Souls II Scholar of the First Sin", "Souls-Like", "01-04-2015", "From Software", "Bandai Namco"));
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        JLabel labelTitulo = new JLabel("Pesquisar Jogos");
+        labelTitulo.setFont(new Font("Arial", Font.BOLD, 18));
+
         JTextField campoPesquisa = new JTextField(20);
         JButton btnPesquisar = new JButton("Pesquisar");
         JButton btnCadastrar = new JButton("Cadastrar Jogo");
         JButton btnReview = new JButton("Fazer Review");
 
-        panel.add(new JLabel("Pesquisar jogo:"));
-        panel.add(campoPesquisa);
-        panel.add(btnPesquisar);
-        panel.add(btnCadastrar);
-        panel.add(btnReview);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(labelTitulo, gbc);
+
+        gbc.gridy = 1;
+        panel.add(new JLabel("Digite o nome do jogo:"), gbc);
+
+        gbc.gridy = 2;
+        panel.add(campoPesquisa, gbc);
+
+        gbc.gridy = 3;
+        panel.add(btnPesquisar, gbc);
+
+        gbc.gridy = 4;
+        panel.add(btnCadastrar, gbc);
+
+        gbc.gridy = 5;
+        panel.add(btnReview, gbc);
 
         btnPesquisar.addActionListener(e -> {
             String termo = campoPesquisa.getText().toLowerCase();
-            StringBuilder resultado = new StringBuilder("Resultados:\n");
+            StringBuilder resultado = new StringBuilder("<html><b>Resultados:</b><br>");
             for (Jogo j : listaJogos) {
                 if (j.getNome().toLowerCase().contains(termo)) {
-                    resultado.append(j.getNome()).append("\n");
+                    resultado.append(j.getNome()).append("<br>");
                 }
             }
+            resultado.append("</html>");
             JOptionPane.showMessageDialog(this, resultado.toString());
         });
 
