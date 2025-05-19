@@ -11,7 +11,7 @@ Este é um projeto simples para estudos desenvolvido com **Java Swing**, permiti
 
 ---
 
-## 🧩 Funcionalidades
+## Funcionalidades
 
 - [x] Cadastrar jogos (nome, descrição, data de lançamento, desenvolvedora e publicadora)
 - [x] Pesquisar jogos pelo nome
