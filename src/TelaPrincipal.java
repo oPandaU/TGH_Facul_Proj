@@ -7,6 +7,7 @@ import java.util.List;
 public class TelaPrincipal extends JFrame {
 
     private List<Jogo> listaJogos = new ArrayList<>();
+    private List<Review> listaReviews = new ArrayList<>();
 
     public TelaPrincipal() {
         setTitle("Pesquisar Jogos");
@@ -30,6 +31,7 @@ public class TelaPrincipal extends JFrame {
         JButton btnPesquisar = new JButton("Pesquisar");
         JButton btnCadastrar = new JButton("Cadastrar Jogo");
         JButton btnReview = new JButton("Fazer Review");
+        JButton btnVerReviews = new JButton("Ver Todas as Reviews");
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -50,6 +52,9 @@ public class TelaPrincipal extends JFrame {
         gbc.gridy = 5;
         panel.add(btnReview, gbc);
 
+        gbc.gridy = 6;
+        panel.add(btnVerReviews, gbc);
+
         btnPesquisar.addActionListener(e -> {
             String termo = campoPesquisa.getText().toLowerCase();
             StringBuilder resultado = new StringBuilder("<html><b>Resultados:</b><br>");
@@ -63,7 +68,20 @@ public class TelaPrincipal extends JFrame {
         });
 
         btnCadastrar.addActionListener(e -> new TelaCadastro(listaJogos).setVisible(true));
-        btnReview.addActionListener(e -> new TelaReview(listaJogos).setVisible(true));
+        btnReview.addActionListener(e -> new TelaReview(listaJogos, listaReviews).setVisible(true));
+
+        btnVerReviews.addActionListener(e -> {
+            if (listaReviews.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nenhuma review cadastrada ainda.");
+            } else {
+                StringBuilder todas = new StringBuilder("<html><b>Todas as Reviews:</b><br>");
+                for (Review r : listaReviews) {
+                    todas.append(r.toString().replace("\n", "<br>"));
+                }
+                todas.append("</html>");
+                JOptionPane.showMessageDialog(this, todas.toString());
+            }
+        });
 
         add(panel);
     }

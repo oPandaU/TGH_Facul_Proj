@@ -6,9 +6,11 @@ import java.util.List;
 public class TelaReview extends JFrame {
 
     private List<Jogo> listaJogos;
+    private List<Review> listaReviews;
 
-    public TelaReview(List<Jogo> listaJogos) {
+    public TelaReview(List<Jogo> listaJogos, List<Review> listaReviews) {
         this.listaJogos = listaJogos;
+        this.listaReviews = listaReviews;
         setTitle("Fazer Review");
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
