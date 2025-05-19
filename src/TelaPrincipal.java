@@ -106,10 +106,12 @@ public class TelaPrincipal extends JFrame {
                 String[] partes = linha.split("\\|\\|");
                 if (partes.length == 2) {
                     listaReviews.add(new Review(partes[0], partes[1]));
+                    System.out.println("Review carregada: " + partes[0] + " - " + partes[1]);
                 }
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar as reviews.");
+            e.printStackTrace();
         }
     }
 

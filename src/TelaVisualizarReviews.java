@@ -15,7 +15,7 @@ public class TelaVisualizarReviews extends JFrame {
         this.listaJogos = listaJogos;
         this.listaReviews = listaReviews;
         setTitle("Ver Reviews por Jogo");
-        setSize(500, 400);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -32,7 +32,7 @@ public class TelaVisualizarReviews extends JFrame {
             comboJogos.addItem(j.getNome());
         }
 
-        JTextArea areaReviews = new JTextArea(10, 30);
+        JTextArea areaReviews = new JTextArea(15, 40);
         areaReviews.setEditable(false);
         JScrollPane scroll = new JScrollPane(areaReviews);
 
@@ -68,13 +68,17 @@ public class TelaVisualizarReviews extends JFrame {
         btnVer.addActionListener(e -> {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
             StringBuilder texto = new StringBuilder();
+            boolean encontrou = false;
+
             for (Review r : listaReviews) {
                 if (r.getJogoNome().equals(jogoSelecionado)) {
                     texto.append("Review: ").append(r.getTexto()).append("\n--------------------\n");
+                    encontrou = true;
                 }
             }
-            if (texto.length() == 0) {
-                areaReviews.setText("Nenhuma review encontrada.");
+
+            if (!encontrou) {
+                areaReviews.setText("Nenhuma review encontrada para '" + jogoSelecionado + "'.");
             } else {
                 areaReviews.setText(texto.toString());
             }
@@ -105,7 +109,7 @@ public class TelaVisualizarReviews extends JFrame {
                     listaReviews.remove(i);
                     salvarReviews();
                     JOptionPane.showMessageDialog(this, "Review excluída!");
-                    btnVer.doClick(); 
+                    btnVer.doClick();
                     encontrou = true;
                     break;
                 }
