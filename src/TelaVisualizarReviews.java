@@ -1,9 +1,12 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
-public class TelaVisualizarReviews extends JFrame{
+public class TelaVisualizarReviews extends JFrame {
 
     private List<Jogo> listaJogos;
     private List<Review> listaReviews;
@@ -79,22 +82,13 @@ public class TelaVisualizarReviews extends JFrame{
 
         btnEditar.addActionListener(e -> {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
-            StringBuilder texto = new StringBuilder();
-            for (Review r : listaReviews) {
-                if (r.getJogoNome().equals(jogoSelecionado)) {
-                    texto.append("Review: ").append(r.getTexto()).append("\n--------------------\n");
-                }
-            }
-            if (texto.length() == 0) {
-                JOptionPane.showMessageDialog(this, "Nenhuma review para editar.");
-                return;
-            }
-
             String novaReview = JOptionPane.showInputDialog(this, "Digite a nova review:");
+
             if (novaReview != null && !novaReview.trim().isEmpty()) {
                 for (int i = 0; i < listaReviews.size(); i++) {
                     if (listaReviews.get(i).getJogoNome().equals(jogoSelecionado)) {
                         listaReviews.set(i, new Review(jogoSelecionado, novaReview));
+                        salvarReviews();
                         JOptionPane.showMessageDialog(this, "Review atualizada!");
                         btnVer.doClick();
                         break;
@@ -109,8 +103,9 @@ public class TelaVisualizarReviews extends JFrame{
             for (int i = 0; i < listaReviews.size(); i++) {
                 if (listaReviews.get(i).getJogoNome().equals(jogoSelecionado)) {
                     listaReviews.remove(i);
+                    salvarReviews();
                     JOptionPane.showMessageDialog(this, "Review excluída!");
-                    btnVer.doClick();
+                    btnVer.doClick(); 
                     encontrou = true;
                     break;
                 }
@@ -121,5 +116,16 @@ public class TelaVisualizarReviews extends JFrame{
         });
 
         add(panel);
+    }
+
+    private void salvarReviews() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("reviews.txt"))) {
+            for (Review r : listaReviews) {
+                writer.write(r.getJogoNome() + "||" + r.getTexto());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar as reviews.");
+        }
     }
 }

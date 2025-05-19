@@ -35,6 +35,7 @@ public class TelaPrincipal extends JFrame {
         JButton btnCadastrar = new JButton("Cadastrar Jogo");
         JButton btnReview = new JButton("Fazer Review");
         JButton btnVerReviews = new JButton("Ver Todas as Reviews");
+        JButton btnVerReviewsPorJogo = new JButton("Ver Reviews por Jogo");
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -58,6 +59,9 @@ public class TelaPrincipal extends JFrame {
         gbc.gridy = 6;
         panel.add(btnVerReviews, gbc);
 
+        gbc.gridy = 7;
+        panel.add(btnVerReviewsPorJogo, gbc);
+
         btnPesquisar.addActionListener(e -> {
             String termo = campoPesquisa.getText().toLowerCase();
             StringBuilder resultado = new StringBuilder("<html><b>Resultados:</b><br>");
@@ -72,6 +76,7 @@ public class TelaPrincipal extends JFrame {
 
         btnCadastrar.addActionListener(e -> new TelaCadastro(listaJogos).setVisible(true));
         btnReview.addActionListener(e -> new TelaReview(listaJogos, listaReviews).setVisible(true));
+        btnVerReviewsPorJogo.addActionListener(e -> new TelaVisualizarReviews(listaJogos, listaReviews).setVisible(true));
 
         btnVerReviews.addActionListener(e -> {
             if (listaReviews.isEmpty()) {
@@ -105,6 +110,17 @@ public class TelaPrincipal extends JFrame {
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar as reviews.");
+        }
+    }
+
+    private void salvarReviews() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("reviews.txt"))) {
+            for (Review r : listaReviews) {
+                writer.write(r.getJogoNome() + "||" + r.getTexto());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar as reviews.");
         }
     }
 
