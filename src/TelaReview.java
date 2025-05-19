@@ -1,6 +1,9 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class TelaReview extends JFrame {
@@ -66,6 +69,8 @@ public class TelaReview extends JFrame {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
             String review = areaReview.getText();
             if (review.length() > 10) {
+                listaReviews.add(new Review(jogoSelecionado, review));
+                salvarReviews();
                 JOptionPane.showMessageDialog(this, "Review enviada para: " + jogoSelecionado);
                 dispose();
             } else {
@@ -74,5 +79,16 @@ public class TelaReview extends JFrame {
         });
 
         add(panel);
+    }
+
+    private void salvarReviews() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("reviews.txt"))) {
+            for (Review r : listaReviews) {
+                writer.write(r.getJogoNome() + "||" + r.getTexto());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar as reviews.");
+        }
     }
 }

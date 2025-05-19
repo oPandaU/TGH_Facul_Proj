@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 public class TelaPrincipal extends JFrame {
 
@@ -14,6 +15,8 @@ public class TelaPrincipal extends JFrame {
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        carregarReviews();
 
         listaJogos.add(new Jogo("The Legend of Zelda", "Aventura", "2023-05-12", "Nintendo", "Nintendo"));
         listaJogos.add(new Jogo("God of War", "Ação", "2022-01-14", "Santa Monica Studio", "Sony"));
@@ -84,6 +87,25 @@ public class TelaPrincipal extends JFrame {
         });
 
         add(panel);
+    }
+
+    private void carregarReviews() {
+        File file = new File("reviews.txt");
+        if (!file.exists()) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] partes = linha.split("\\|\\|");
+                if (partes.length == 2) {
+                    listaReviews.add(new Review(partes[0], partes[1]));
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao carregar as reviews.");
+        }
     }
 
 }
