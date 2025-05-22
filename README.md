@@ -19,6 +19,6 @@ Este é um projeto simples para estudos desenvolvido com **Java Swing**, permiti
 - [x] Visualizar todas as reviews
 - [x] Visualizar reviews por jogo específico
 - [x] Editar e excluir reviews
-- [ ] Salvar dados em banco de dados (em desenvolvimento)
+- [x] Salvar dados em banco de dados (desenvolvido)
 
 ---
