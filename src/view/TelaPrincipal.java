@@ -1,4 +1,8 @@
+package view;
 
+
+import model.Review;
+import model.Jogo;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;

@@ -1,4 +1,7 @@
+package dao;
 
+
+import model.Jogo;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

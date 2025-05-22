@@ -1,4 +1,7 @@
+package view;
 
+
+import model.Jogo;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
