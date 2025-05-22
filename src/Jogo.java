@@ -6,6 +6,7 @@ public class Jogo {
     private String dataLancamento;
     private String desenvolvedora;
     private String publicadora;
+    private int id;
 
     public Jogo(String nome, String descricao, String dataLancamento, String desenvolvedora, String publicadora) {
         this.nome = nome;
@@ -13,6 +14,14 @@ public class Jogo {
         this.dataLancamento = dataLancamento;
         this.desenvolvedora = desenvolvedora;
         this.publicadora = publicadora;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNome() {
