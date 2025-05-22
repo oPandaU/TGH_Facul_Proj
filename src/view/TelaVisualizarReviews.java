@@ -1,25 +1,23 @@
 package view;
 
-
+import dao.ReviewDAO;
 import model.Review;
 import model.Jogo;
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 public class TelaVisualizarReviews extends JFrame {
 
     private List<Jogo> listaJogos;
-    private List<Review> listaReviews;
+    private ReviewDAO reviewDAO;
 
-    public TelaVisualizarReviews(List<Jogo> listaJogos, List<Review> listaReviews) {
+    public TelaVisualizarReviews(List<Jogo> listaJogos, ReviewDAO reviewDAO) {
         this.listaJogos = listaJogos;
-        this.listaReviews = listaReviews;
+        this.reviewDAO = reviewDAO;
+
         setTitle("Ver Reviews por Jogo");
-        setSize(800, 600);
+        setSize(600, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -71,69 +69,78 @@ public class TelaVisualizarReviews extends JFrame {
 
         btnVer.addActionListener(e -> {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
-            StringBuilder texto = new StringBuilder();
-            boolean encontrou = false;
-
-            for (Review r : listaReviews) {
-                if (r.getJogoNome().equals(jogoSelecionado)) {
-                    texto.append("Review: ").append(r.getTexto()).append("\n--------------------\n");
-                    encontrou = true;
-                }
+            int jogoId = getIdPorNome(jogoSelecionado);
+            if (jogoId == -1) {
+                areaReviews.setText("Nenhum ID encontrado para esse jogo.");
+                return;
             }
 
-            if (!encontrou) {
-                areaReviews.setText("Nenhuma review encontrada para '" + jogoSelecionado + "'.");
+            List<String> reviews = reviewDAO.listarPorJogo(jogoId)
+                    .stream()
+                    .map(r -> r.getTexto())
+                    .toList();
+
+            if (reviews.isEmpty()) {
+                areaReviews.setText("Nenhuma review encontrada.");
             } else {
+                StringBuilder texto = new StringBuilder();
+                for (String rev : reviews) {
+                    texto.append("Review: ").append(rev).append("\n--------------------\n");
+                }
                 areaReviews.setText(texto.toString());
             }
         });
 
         btnEditar.addActionListener(e -> {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
-            String novaReview = JOptionPane.showInputDialog(this, "Digite a nova review:");
+            int jogoId = getIdPorNome(jogoSelecionado);
+            if (jogoId == -1) {
+                JOptionPane.showMessageDialog(this, "Erro ao encontrar jogo.");
+                return;
+            }
 
+            List<String> reviews = reviewDAO.listarPorJogo(jogoId)
+                    .stream()
+                    .map(r -> r.getTexto())
+                    .toList();
+
+            if (reviews.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nenhuma review encontrada.");
+                return;
+            }
+
+            String novaReview = JOptionPane.showInputDialog(this, "Edite a review:", reviews.get(0));
             if (novaReview != null && !novaReview.trim().isEmpty()) {
-                for (int i = 0; i < listaReviews.size(); i++) {
-                    if (listaReviews.get(i).getJogoNome().equals(jogoSelecionado)) {
-                        listaReviews.set(i, new Review(jogoSelecionado, novaReview));
-                        salvarReviews();
-                        JOptionPane.showMessageDialog(this, "Review atualizada!");
-                        btnVer.doClick();
-                        break;
-                    }
-                }
+                reviewDAO.excluirPrimeiraReview(jogoId);
+                reviewDAO.salvar(new Review("", novaReview), jogoId);
+                JOptionPane.showMessageDialog(this, "Review atualizada!");
+                btnVer.doClick();
             }
         });
 
         btnExcluir.addActionListener(e -> {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
-            boolean encontrou = false;
-            for (int i = 0; i < listaReviews.size(); i++) {
-                if (listaReviews.get(i).getJogoNome().equals(jogoSelecionado)) {
-                    listaReviews.remove(i);
-                    salvarReviews();
-                    JOptionPane.showMessageDialog(this, "Review excluída!");
-                    btnVer.doClick();
-                    encontrou = true;
-                    break;
-                }
+            int jogoId = getIdPorNome(jogoSelecionado);
+            if (jogoId == -1) {
+                JOptionPane.showMessageDialog(this, "Erro ao encontrar jogo.");
+                return;
             }
-            if (!encontrou) {
-                JOptionPane.showMessageDialog(this, "Nenhuma review encontrada para esse jogo.");
-            }
+
+            reviewDAO.excluirTodasReviews(jogoId);
+            JOptionPane.showMessageDialog(this, "Todas as reviews excluídas!");
+            areaReviews.setText("");
         });
 
         add(panel);
     }
 
-    private void salvarReviews() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("reviews.txt"))) {
-            for (Review r : listaReviews) {
-                writer.write(r.getJogoNome() + "||" + r.getTexto());
-                writer.newLine();
+    private int getIdPorNome(String nome) {
+        for (Jogo j : listaJogos) {
+            if (j.getNome().equals(nome)) {
+                return j.getId();
             }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar as reviews.");
         }
+        return -1;
     }
+
 }

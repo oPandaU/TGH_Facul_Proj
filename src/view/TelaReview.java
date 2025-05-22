@@ -1,25 +1,22 @@
 package view;
 
-
+import dao.ReviewDAO;
 import model.Review;
 import model.Jogo;
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.util.List;
 
 public class TelaReview extends JFrame {
 
-    private List<Jogo> listaJogos;
-    private List<Review> listaReviews;
+    private ReviewDAO reviewDAO;
 
-    public TelaReview(List<Jogo> listaJogos, List<Review> listaReviews) {
-        this.listaJogos = listaJogos;
-        this.listaReviews = listaReviews;
-        setTitle("Fazer Review");
-        setSize(500, 400);
+    public TelaReview(ReviewDAO reviewDAO, List<Jogo> listaJogos) {
+        this.reviewDAO = reviewDAO;
+
+        setTitle("Deixar uma Review");
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -39,10 +36,10 @@ public class TelaReview extends JFrame {
         }
 
         JLabel labelReview = new JLabel("Sua review:");
-        JTextArea areaReview = new JTextArea(5, 25);
+        JTextArea areaReview = new JTextArea(5, 30);
         JScrollPane scroll = new JScrollPane(areaReview);
 
-        JButton btnEnviar = new JButton("Enviar Review");
+        JButton btnSalvar = new JButton("Salvar Review");
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -50,49 +47,58 @@ public class TelaReview extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(labelTitulo, gbc);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 1;
         gbc.gridy = 1;
-        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
         panel.add(labelJogo, gbc);
-        gbc.gridx = 1;
-        panel.add(comboJogos, gbc);
 
         gbc.gridy = 2;
-        gbc.gridx = 0;
-        panel.add(labelReview, gbc);
-        gbc.gridx = 1;
-        panel.add(scroll, gbc);
+        panel.add(comboJogos, gbc);
 
         gbc.gridy = 3;
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(btnEnviar, gbc);
+        panel.add(labelReview, gbc);
 
-        btnEnviar.addActionListener(e -> {
+        gbc.gridy = 4;
+        panel.add(scroll, gbc);
+
+        gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(btnSalvar, gbc);
+
+        btnSalvar.addActionListener(e -> {
             String jogoSelecionado = (String) comboJogos.getSelectedItem();
-            String review = areaReview.getText();
-            if (review.length() > 10) {
-                listaReviews.add(new Review(jogoSelecionado, review));
-                salvarReviews();
-                JOptionPane.showMessageDialog(this, "Review enviada para: " + jogoSelecionado);
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "A review deve ter pelo menos 10 caracteres.");
+            String textoReview = areaReview.getText().trim();
+
+            if (textoReview.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "A review não pode estar vazia.", "Erro", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int jogoId = getIdPorNome(listaJogos, jogoSelecionado);
+            if (jogoId == -1) {
+                JOptionPane.showMessageDialog(this, "Erro ao encontrar o jogo selecionado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                reviewDAO.salvar(new Review("", textoReview), jogoId);
+                JOptionPane.showMessageDialog(this, "Review salva com sucesso!");
+                areaReview.setText("");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar a review.", "Erro", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
             }
         });
 
         add(panel);
     }
 
-    private void salvarReviews() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("reviews.txt"))) {
-            for (Review r : listaReviews) {
-                writer.write(r.getJogoNome() + "||" + r.getTexto());
-                writer.newLine();
+    private int getIdPorNome(List<Jogo> listaJogos, String nome) {
+        for (Jogo j : listaJogos) {
+            if (j.getNome().equals(nome)) {
+                return j.getId();
             }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar as reviews.");
         }
+        return -1;
     }
 }
