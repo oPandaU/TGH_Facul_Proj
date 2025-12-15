@@ -1,21 +1,27 @@
 const API_URL = 'http://localhost:8080/api';
 let currentUser = null;
+
 window.onload = function () {
     carregarSelects();
     listarTodosGames();
 };
+
 function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    event.target.classList.add('active');
+    // Corrigido: buscar o botão que foi clicado pelo data attribute ou texto
+    const clickedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
+        btn.getAttribute('onclick').includes(tabName)
+    );
+    if (clickedBtn) clickedBtn.classList.add('active');
+    
     document.getElementById(`tab-${tabName}`).classList.add('active');
 
-    if (tabName === 'games')
-        listarTodosGames();
-    if (tabName === 'usuarios')
-        listarUsuarios();
+    if (tabName === 'games') listarTodosGames();
+    if (tabName === 'usuarios') listarUsuarios();
 }
+
 function mostrarMensagem(elementId, mensagem, tipo) {
     const el = document.getElementById(elementId);
     el.textContent = mensagem;
@@ -23,6 +29,7 @@ function mostrarMensagem(elementId, mensagem, tipo) {
     el.style.display = 'block';
     setTimeout(() => el.style.display = 'none', 4000);
 }
+
 async function carregarSelects() {
     try {
         const [gamesResp, usuariosResp] = await Promise.all([
@@ -36,24 +43,29 @@ async function carregarSelects() {
         const gameSelects = ['reviewGame', 'selectGameReviews', 'jogadoGame'];
         gameSelects.forEach(selectId => {
             const select = document.getElementById(selectId);
-            select.innerHTML = '<option value="">Selecione...</option>';
-            games.forEach(g => {
-                select.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
-            });
+            if (select) {
+                select.innerHTML = '<option value="">Selecione...</option>';
+                games.forEach(g => {
+                    select.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
+                });
+            }
         });
 
         const userSelects = ['reviewUsuario', 'jogadoUsuario', 'selectUsuarioHistorico'];
         userSelects.forEach(selectId => {
             const select = document.getElementById(selectId);
-            select.innerHTML = '<option value="">Selecione...</option>';
-            usuarios.forEach(u => {
-                select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
-            });
+            if (select) {
+                select.innerHTML = '<option value="">Selecione...</option>';
+                usuarios.forEach(u => {
+                    select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+                });
+            }
         });
     } catch (error) {
         console.error('Erro ao carregar selects:', error);
     }
 }
+
 async function listarTodosGames() {
     try {
         const response = await fetch(`${API_URL}/games`);
@@ -62,7 +74,10 @@ async function listarTodosGames() {
         exibirGames(games);
     } catch (error) {
         console.error('Erro:', error);
-        document.getElementById('resultadosGames').innerHTML = '<p style="color: #ff6b6b;">❌ Erro: Backend não está rodando! Inicie o servidor Spring Boot.</p>';
+        const container = document.getElementById('resultadosGames');
+        if (container) {
+            container.innerHTML = '<p style="color: #ff6b6b;">❌ Erro: Backend não está rodando! Inicie o servidor Spring Boot.</p>';
+        }
     }
 }
 
@@ -84,20 +99,22 @@ async function pesquisarGames() {
 
 function exibirGames(games) {
     const container = document.getElementById('resultadosGames');
+    if (!container) return;
+    
     if (!Array.isArray(games) || games.length === 0) {
         container.innerHTML = '<p>Nenhum game encontrado.</p>';
         return;
     }
     container.innerHTML = games.map(g => `
-                <div class="game-card">
-                    <h3>${g.nome}</h3>
-                    <p><strong>Developer:</strong> ${g.developer || 'N/A'}</p>
-                    <p><strong>Publisher:</strong> ${g.publisher || 'N/A'}</p>
-                    <p><strong>Lançamento:</strong> ${g.dataLancamento || 'N/A'}</p>
-                    <p>${g.descricao || 'Sem descrição'}</p>
-                    ${g.genero ? `<span class="genre">${g.genero}</span>` : ''}
-                </div>
-            `).join('');
+        <div class="game-card">
+            <h3>${g.nome}</h3>
+            <p><strong>Developer:</strong> ${g.developer || 'N/A'}</p>
+            <p><strong>Publisher:</strong> ${g.publisher || 'N/A'}</p>
+            <p><strong>Lançamento:</strong> ${g.dataLancamento || 'N/A'}</p>
+            <p>${g.descricao || 'Sem descrição'}</p>
+            ${g.genero ? `<span class="genre">${g.genero}</span>` : ''}
+        </div>
+    `).join('');
 }
 
 async function cadastrarGame(e) {
@@ -131,6 +148,7 @@ async function cadastrarGame(e) {
         mostrarMensagem('msgCadastroGame', 'Erro ao conectar com servidor.', 'error');
     }
 }
+
 async function salvarReview() {
     const review = {
         usuarioId: parseInt(document.getElementById('reviewUsuario').value),
@@ -172,6 +190,7 @@ async function salvarReview() {
 async function carregarReviewsGame() {
     const gameId = document.getElementById('selectGameReviews').value;
     const container = document.getElementById('listaReviews');
+    if (!container) return;
 
     if (!gameId) {
         container.innerHTML = '';
@@ -191,26 +210,27 @@ async function carregarReviewsGame() {
 
         const media = mediaResp.media || 0;
         container.innerHTML = `
-                    <div style="background: rgba(102, 126, 234, 0.3); padding: 15px; border-radius: 10px; margin: 20px 0;">
-                        <h3>Média: ${media.toFixed(1)} ⭐</h3>
-                        <p>Total de ${reviews.length} review(s)</p>
+            <div style="background: rgba(102, 126, 234, 0.3); padding: 15px; border-radius: 10px; margin: 20px 0;">
+                <h3>Média: ${media.toFixed(1)} ⭐</h3>
+                <p>Total de ${reviews.length} review(s)</p>
+            </div>
+            ${reviews.map(r => `
+                <div class="review-item">
+                    <div class="review-header">
+                        <strong>${r.usuarioNome || 'Usuário'}</strong>
+                        <span class="review-nota">${r.nota}/10</span>
                     </div>
-                    ${reviews.map(r => `
-                        <div class="review-item">
-                            <div class="review-header">
-                                <strong>${r.usuarioNome || 'Usuário'}</strong>
-                                <span class="review-nota">${r.nota}/10</span>
-                            </div>
-                            <p>${r.avaliacao}</p>
-                            <small style="opacity: 0.7;">${r.dataReview || ''}</small>
-                        </div>
-                    `).join('')}
-                `;
+                    <p>${r.avaliacao}</p>
+                    <small style="opacity: 0.7;">${r.dataReview || ''}</small>
+                </div>
+            `).join('')}
+        `;
     } catch (error) {
         console.error('Erro:', error);
         container.innerHTML = '<p>Erro ao carregar reviews.</p>';
     }
 }
+
 async function cadastrarUsuario(e) {
     e.preventDefault();
     const usuario = {
@@ -245,6 +265,7 @@ async function listarUsuarios() {
         const response = await fetch(`${API_URL}/usuarios`);
         const usuarios = await response.json();
         const container = document.getElementById('listaUsuarios');
+        if (!container) return;
 
         if (usuarios.length === 0) {
             container.innerHTML = '<p>Nenhum usuário cadastrado.</p>';
@@ -273,6 +294,7 @@ async function listarUsuarios() {
         console.error('Erro ao listar usuários:', error);
     }
 }
+
 async function registrarJogoJogado() {
     const jogado = {
         usuarioId: parseInt(document.getElementById('jogadoUsuario').value),
@@ -307,6 +329,7 @@ async function registrarJogoJogado() {
 async function carregarHistoricoUsuario() {
     const usuarioId = document.getElementById('selectUsuarioHistorico').value;
     const container = document.getElementById('historicoJogos');
+    if (!container) return;
 
     if (!usuarioId) {
         container.innerHTML = '';
@@ -338,26 +361,3 @@ async function carregarHistoricoUsuario() {
         container.innerHTML = '<p>Erro ao carregar histórico.</p>';
     }
 }
-fetch("http://localhost:8080/api/games")
-        .then(res => res.json())
-        .then(games => {
-            const lista = document.getElementById("lista-games");
-            games.forEach(game => {
-                const li = document.createElement("li");
-                li.textContent = game.nome;
-                lista.appendChild(li);
-            });
-        });
-fetch("/api/games")
-        .then(res => res.json())
-        .then(data => {
-            if (!Array.isArray(data)) {
-                console.error("Resposta não é lista:", data);
-                return;
-            }
-
-            data.forEach(game => {
-                console.log(game.nome);
-            });
-        })
-        .catch(err => console.error(err));
