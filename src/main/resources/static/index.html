@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gathering Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 The Gathering Hub</h1>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('games')">🎯 Games</button>
+            <button class="tab-btn" onclick="switchTab('reviews')">⭐ Reviews</button>
+            <button class="tab-btn" onclick="switchTab('usuarios')">👥 Usuários</button>
+            <button class="tab-btn" onclick="switchTab('jogados')">🎲 Jogos Jogados</button>
+        </div>
+
+        <div id="tab-games" class="tab-content active">
+            <div class="card">
+                <h2>🔍 Pesquisar Games</h2>
+                <div class="search-container">
+                    <input type="text" id="searchGames" placeholder="Digite o nome do game...">
+                    <button onclick="pesquisarGames()">Pesquisar</button>
+                    <button class="btn-secondary" onclick="listarTodosGames()">Ver Todos</button>
+                </div>
+                <div id="resultadosGames" class="results-grid"></div>
+            </div>
+
+            <div class="card">
+                <h2>➕ Cadastrar Game</h2>
+                <div id="msgCadastroGame" class="message"></div>
+                <form id="formCadastroGame" onsubmit="cadastrarGame(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome *</label>
+                            <input type="text" id="gameNome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Lançamento *</label>
+                            <input type="date" id="gameData" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Developer</label>
+                            <input type="text" id="gameDeveloper">
+                        </div>
+                        <div class="form-group">
+                            <label>Publisher</label>
+                            <input type="text" id="gamePublisher">
+                        </div>
+                        <div class="form-group">
+                            <label>Gênero</label>
+                            <input type="text" id="gameGenero" placeholder="Ex: RPG, FPS, Plataforma...">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Descrição</label>
+                            <textarea id="gameDescricao"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit">Cadastrar Game</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="tab-reviews" class="tab-content">
+            <div class="card">
+                <h2>📝 Escrever Review</h2>
+                <div id="msgReview" class="message"></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Usuário *</label>
+                        <select id="reviewUsuario" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Game *</label>
+                        <select id="reviewGame" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nota (0-10) *</label>
+                        <input type="number" id="reviewNota" min="0" max="10" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Avaliação *</label>
+                        <textarea id="reviewAvaliacao" required></textarea>
+                    </div>
+                </div>
+                <button onclick="salvarReview()">Salvar Review</button>
+            </div>
+
+            <div class="card">
+                <h2>🎮 Ver Reviews de um Game</h2>
+                <div class="form-group">
+                    <label>Selecione o Game</label>
+                    <select id="selectGameReviews" onchange="carregarReviewsGame()">
+                        <option value="">Escolha um game...</option>
+                    </select>
+                </div>
+                <div id="listaReviews"></div>
+            </div>
+        </div>
+
+        <div id="tab-usuarios" class="tab-content">
+            <div class="card">
+                <h2>👤 Cadastrar Usuário</h2>
+                <div id="msgUsuario" class="message"></div>
+                <form id="formUsuario" onsubmit="cadastrarUsuario(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome *</label>
+                            <input type="text" id="usuarioNome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="usuarioEmail" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Senha *</label>
+                            <input type="password" id="usuarioSenha" required>
+                        </div>
+                    </div>
+                    <button type="submit">Cadastrar Usuário</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>👥 Lista de Usuários</h2>
+                <button onclick="listarUsuarios()" class="btn-secondary">Atualizar Lista</button>
+                <div id="listaUsuarios" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div id="tab-jogados" class="tab-content">
+            <div class="card">
+                <h2>🎲 Registrar Jogo Jogado</h2>
+                <div id="msgJogado" class="message"></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Usuário *</label>
+                        <select id="jogadoUsuario" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Game *</label>
+                        <select id="jogadoGame" required></select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Data que Jogou</label>
+                        <input type="date" id="jogadoData">
+                    </div>
+                </div>
+                <button onclick="registrarJogoJogado()">Registrar</button>
+            </div>
+
+            <div class="card">
+                <h2>📊 Histórico de Jogos Jogados</h2>
+                <div class="form-group">
+                    <label>Ver jogos jogados por usuário:</label>
+                    <select id="selectUsuarioHistorico" onchange="carregarHistoricoUsuario()">
+                        <option value="">Escolha um usuário...</option>
+                    </select>
+                </div>
+                <div id="historicoJogos"></div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
