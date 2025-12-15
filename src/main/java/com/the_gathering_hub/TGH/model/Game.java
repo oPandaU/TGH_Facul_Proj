@@ -1,6 +1,6 @@
 package com.the_gathering_hub.TGH.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,9 +33,11 @@ public class Game {
     private String genero;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<JogoJogado> jogosJogados = new ArrayList<>();
 
 
