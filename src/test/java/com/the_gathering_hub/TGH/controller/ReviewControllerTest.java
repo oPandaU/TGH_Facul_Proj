@@ -40,7 +40,6 @@ class ReviewControllerTest {
         review.setId(1);
         review.setNota(9);
         review.setAvaliacao("Excelente jogo!");
-        // Não precisamos setar usuario e game nos testes unitários
 
         reviewDTO = new ReviewDTO();
         reviewDTO.setNota(9);
